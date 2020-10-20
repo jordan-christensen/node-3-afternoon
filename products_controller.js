@@ -1,5 +1,5 @@
 module.exports = {
-   create: ( req, res ) => {
+   create: ( req, res, next ) => {
       const dbInstance = req.app.get('db');
       const { name, description, price, image_url } = req.body;
 
@@ -11,7 +11,7 @@ module.exports = {
       });
    },
 
-   getOne: ( req, res ) => {
+   getOne: ( req, res, next ) => {
       const dbInstance = req.app.get('db');
       const { id } = req.params;
 
@@ -22,28 +22,31 @@ module.exports = {
             console.log(err)
          } );
    },
-   getAll: ( req, res ) => {
+
+   getAll: ( req, res, next ) => {
       const dbInstance = req.app.get('db');
 
       dbInstance.read_products()
-         .then( () => res.sendStatus(200) )
+         .then(products => res.status(200).send(products))
          .catch( err => {
-            res.status(500).send({errorMessage: "Oops! Something went wrong. Our engineers have been informed!"});
+            res.status(500).send({ errorMessage: "Oops! Something went wrong. Our engineers have been informed!"});
             console.log(err)
          });
    },
-   update: ( req, res ) => {
+
+   update: ( req, res, next ) => {
       const dbInstance = req.app.get('db');
       const { params, query } = req;
 
-      dbInstance.update_product([ params.id, params.desc])
-         .then( () => res.sendStatus(200) )
+      dbInstance.update_product([params.id, query.desc])
+         .then(() => res.sendStatus(200))
          .catch( err => {
-            res.status(500).send({errorMessage: "Oops! Something went wrong. Our engineers have been informed!"});
+            res.status(500).send({ errorMessage: "Oops! Something went wrong. Our engineers have been informed!"});
             console.log(err)
          });
    },
-   delete: ( req, res ) => {
+
+   delete: ( req, res, next ) => {
       const dbInstance = req.app.get('db');
       const { id } = req.params;
 
